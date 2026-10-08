@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Navigate, NavLink, useParams } from 'react-router'
+import { ResetProgressDialog } from '../components/ResetProgressDialog'
 import { StatusLegend, TopicChip } from '../components/TopicChip'
 import { useProgress, useTopics } from '../lib/queries'
 import { STATUS_META, titleCase } from '../lib/status'
@@ -24,6 +25,7 @@ function Browse({ mode, value }: { mode: Mode; value: string }) {
   const progress = useProgress()
   const all = useMemo(() => topics.data ?? [], [topics.data])
   const statusMap = progress.data ?? {}
+  const [resetOpen, setResetOpen] = useState(false)
 
   const categories = useMemo(
     () => [...new Set(all.map((t) => t.super_category))].sort(),
@@ -68,9 +70,27 @@ function Browse({ mode, value }: { mode: Mode; value: string }) {
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Overview topics={inView} statusMap={statusMap} />
+        <div className="flex flex-wrap items-center gap-3">
+          <Overview topics={inView} statusMap={statusMap} />
+          {mode === 'level' && inView.some((t) => statusMap[t.id]) && (
+            <button
+              type="button"
+              onClick={() => setResetOpen(true)}
+              className="text-sm text-slate-500 underline hover:text-red-700"
+            >
+              Reset {value} progress
+            </button>
+          )}
+        </div>
         <StatusLegend />
       </div>
+      {resetOpen && (
+        <ResetProgressDialog
+          open
+          initialScope={value as Level}
+          onClose={() => setResetOpen(false)}
+        />
+      )}
 
       <div className="space-y-3">
         {groupKeys.map((key) => (

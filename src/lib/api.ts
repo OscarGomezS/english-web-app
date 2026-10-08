@@ -1,5 +1,6 @@
 import type {
   AttemptResult,
+  Level,
   AttemptSummary,
   CalendarData,
   DayDetail,
@@ -18,6 +19,13 @@ export const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8500')
 const TOKEN_KEY = 'gp.token'
 const USER_KEY = 'gp.user'
 export const SESSION_EXPIRED_EVENT = 'gp:session-expired'
+
+export interface ResetResult {
+  level: Level | null
+  progress_deleted: number
+  attempts_deleted: number
+  study_days_changed: number
+}
 
 export class ApiError extends Error {
   status: number
@@ -149,6 +157,8 @@ export const api = {
   calendar: (from: string, to: string) =>
     request<CalendarData>('GET', `/study/calendar?from=${from}&to=${to}`),
   day: (date: string) => request<DayDetail>('GET', `/study/day/${date}`),
+  resetProgress: (level: Level | null) =>
+    request<ResetResult>('DELETE', level ? `/progress?level=${level}` : '/progress'),
   report: (topicId: string, exerciseId: string | null, message: string) =>
     request<{ ok: boolean }>('POST', '/reports', {
       topic_id: topicId,

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
 import { api } from '../lib/api'
+import { ResetProgressDialog } from './ResetProgressDialog'
 import { useAuth } from '../lib/auth'
 import { useToast } from '../lib/toast'
 
@@ -53,6 +54,7 @@ function SettingsMenu() {
   const { user, signOut, setUser } = useAuth()
   const toast = useToast()
   const [open, setOpen] = useState(false)
+  const [resetOpen, setResetOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const zones = useMemo(() => {
     try {
@@ -126,12 +128,25 @@ function SettingsMenu() {
           </select>
           <button
             type="button"
+            onClick={() => {
+              setOpen(false)
+              setResetOpen(true)
+            }}
+            className="mt-4 w-full rounded-full border border-red-200 px-4 py-1.5 text-sm font-medium text-red-800 hover:bg-red-50"
+          >
+            Reset progress…
+          </button>
+          <button
+            type="button"
             onClick={signOut}
-            className="mt-4 w-full rounded-full border border-slate-300 px-4 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
+            className="mt-2 w-full rounded-full border border-slate-300 px-4 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
           >
             Sign out
           </button>
         </div>
+      )}
+      {resetOpen && (
+        <ResetProgressDialog open initialScope="all" onClose={() => setResetOpen(false)} />
       )}
     </div>
   )
